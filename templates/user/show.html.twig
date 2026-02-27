@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">Mon profil</h1>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Informations personnelles</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Prénom :</strong>
+                            <p class="text-muted">{{ user.prenom }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Nom :</strong>
+                            <p class="text-muted">{{ user.nom }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Email :</strong>
+                            <p class="text-muted">{{ user.email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Téléphone :</strong>
+                            <p class="text-muted">{{ user.telephone }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date de naissance :</strong>
+                            <p class="text-muted">{{ user.datedenaissance|date('d/m/Y') }}</p>
+                        </div>
+                    </div>
+
+                    {% if user.adresses|length > 0 %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Mes adresses :</strong>
+                            <ul class="list-group mt-2">
+                                {% for adresse in user.adresses %}
+                                    <li class="list-group-item">
+                                        {{ adresse.adress }}<br>
+                                        {{ adresse.codepostal }} {{ adresse.ville }}<br>
+                                        {{ adresse.pays }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Modifier mon profil
+                        </a>
+                        <a href="{{ path('app_home') }}" class="btn btn-secondary">
+                            <i class="bi bi-house"></i> Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

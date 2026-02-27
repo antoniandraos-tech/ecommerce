@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Produit{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Modifier le produit : {{ product.name }}</h2>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.name, 'Nom du produit', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.price, 'Prix (€)', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.price, {'attr': {'class': 'form-control', 'step': '0.01'}}) }}
+                            {{ form_errors(form.price) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.stock, 'Stock disponible', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.stock, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.stock) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.image, 'URL de l\'image', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.image, {'attr': {'class': 'form-control', 'placeholder': 'https://exemple.com/image.jpg'}}) }}
+                        {{ form_errors(form.image) }}
+                        <small class="form-text text-muted">Entrez l'URL complète de l'image du produit</small>
+                    </div>
+
+                    {% if product.image %}
+                    <div class="mb-3">
+                        <label class="form-label">Image actuelle :</label><br>
+                        <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}" style="max-width: 200px;">
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('app_products_admin') }}" class="btn btn-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-save"></i> Enregistrer les modifications
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

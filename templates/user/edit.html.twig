@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">Modifier mon profil</h1>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Informations personnelles</h4>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.prenom, {
+                                    'label': 'Prénom',
+                                    'attr': {'class': 'form-control'}
+                                }) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.nom, {
+                                    'label': 'Nom',
+                                    'attr': {'class': 'form-control'}
+                                }) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.email, {
+                                    'label': 'Email',
+                                    'attr': {'class': 'form-control'}
+                                }) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.telephone, {
+                                    'label': 'Téléphone',
+                                    'attr': {'class': 'form-control'}
+                                }) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.datedenaissance, {
+                                    'label': 'Date de naissance',
+                                    'attr': {'class': 'form-control'}
+                                }) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.password, {
+                                    'label': 'Nouveau mot de passe',
+                                    'attr': {'class': 'form-control', 'placeholder': 'Laisser vide pour ne pas modifier'},
+                                    'required': false
+                                }) }}
+                            </div>
+                        </div>
+                        <hr class="my-4">
+                        
+                       {{ form_start(form) }}
+    {# ... champs du profil ... #}
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Mes adresses</h5>
+        <a href="{{ path('app_adress_new') }}" class="btn btn-success btn-sm">
+            Ajouter une adresse
+        </a>
+    </div>
+
+    {% if user.adresses|length > 0 %}
+        <div class="row mb-3">
+            {% for adresse in user.adresses %}
+            <div class="col-md-6 mb-3">
+                <div class="card border-secondary h-100">
+                    <div class="card-body">
+                        <p class="mb-1"><strong>{{ adresse.adress }}</strong></p>
+                        <p class="mb-1">{{ adresse.codepostal }} {{ adresse.ville }}</p>
+                        <p class="mb-3">{{ adresse.pays }}</p>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_adress_edit', {'id': adresse.id}) }}" class="btn btn-sm btn-warning">
+                                Modifier
+                            </a>
+                            <button type="button" class="btn btn-sm btn-primary" 
+                                    data-id="{{ adresse.id }}"
+                                    data-token="{{ csrf_token('delete' ~ adresse.id) }}"
+                                    onclick="deleteAdress(this)">
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <hr class="my-4">
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-secondary">Annuler</a>
+    </div>
+{{ form_end(form) }}
+
+
+{% for adresse in user.adresses %}
+<form id="delete-form-{{ adresse.id }}" method="post" 
+      action="{{ path('app_adress_delete', {'id': adresse.id}) }}" 
+      style="display: none;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ adresse.id) }}">
+</form>
+{% endfor %}
+
+<script>
+function deleteAdress(btn) {
+    if (confirm('Voulez-vous vraiment supprimer cette adresse ?')) {
+        document.getElementById('delete-form-' + btn.dataset.id).submit();
+    }
+}
+</script>
+
+{% endblock %}  

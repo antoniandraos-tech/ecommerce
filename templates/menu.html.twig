@@ -1,0 +1,49 @@
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ path('app_home') }}">AntoniStore</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Basculer la navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarColor01">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('app_products') }}">Produits</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('app_support') }}">Support</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">À propos</a>
+        </li>
+        <li class="nav-item dropdown">
+          {% if app.user %}
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+              {{ app.user.prenom }} {{ app.user.nom }}
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{ path('app_user_show', {'id': app.user.id}) }}">Mon profil</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
+            </div>
+          {% else %}
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+              Se connecter
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{ path('app_login') }}">Connexion</a>
+              <a class="dropdown-item" href="{{ path('app_register') }}">Inscription</a>
+            </div>
+          {% endif %}
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('app_basket') }}">🛒 Panier</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

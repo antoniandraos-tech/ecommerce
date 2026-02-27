@@ -1,0 +1,89 @@
+{# templates/user/basket.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Panier{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1>Mon Panier</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% if items is empty %}
+        <div class="alert alert-info">
+            Votre panier est vide.
+        </div>
+        <a href="{{ path('app_products') }}" class="btn btn-primary">Continuer mes achats</a>
+    {% else %}
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Produit</th>
+                    <th>Prix unitaire</th>
+                    <th>Quantite</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <strong>{{ item.product.name }}</strong>
+                        {% if item.product.description %}
+                            <br><small class="text-muted">{{ item.product.description|length > 50 ? item.product.description|slice(0, 50) ~ '...' : item.product.description }}</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.product.price }} €</td>
+                    <td>
+                        <form method="post" action="{{ path('app_cart_update', {'id': item.product.id}) }}" class="d-flex align-items-center" style="max-width: 200px;">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm me-2" style="width: 70px;">
+                            <button type="submit" class="btn btn-sm btn-primary">Modifier</button>
+                        </form>
+                    </td>
+                    <td><strong>{{ item.subtotal }} €</strong></td>
+                    <td>
+                        <form method="post" action="{{ path('app_cart_remove', {'id': item.product.id}) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Voulez-vous vraiment retirer ce produit ?');">
+                                Supprimer
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Total :</strong></td>
+                    <td colspan="2"><strong class="text-primary h5">{{ total }} €</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="d-flex justify-content-between mt-4">
+            <div>
+                <a href="{{ path('app_products') }}" class="btn btn-secondary">Continuer mes achats</a>
+                <form method="post" action="{{ path('app_cart_clear') }}" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Voulez-vous vraiment vider le panier ?');">
+                        Vider le panier
+                    </button>
+                </form>
+            </div>
+            <a href="{{ path('app_payment') }}" class="btn btn-success btn-lg">Proceder au paiement</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

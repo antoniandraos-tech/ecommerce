@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une adresse{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1 class="mb-4">Ajouter une adresse</h1>
+
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Nouvelle adresse</h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        {{ form_row(form.adress) }}
+                        {{ form_row(form.codepostal) }}
+                        {{ form_row(form.ville) }}
+                        {{ form_row(form.pays) }}
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-success">Ajouter l'adresse</button>
+                            <a href="{{ path('app_user_edit', {'id': app.user.id}) }}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

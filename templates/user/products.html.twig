@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos Produits - AntoniStore{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Découvrez nos produits exceptionnels</h1>
+
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if product.image %}
+                    <img src="{{ product.image }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                {% else %}
+                    <img src="https://via.placeholder.com/300x250?text=Pas+d%27image" class="card-img-top" alt="Pas d'image">
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">
+                        {% if product.description %}
+                            {{ product.description|length > 100 ? product.description|slice(0, 100) ~ '...' : product.description }}
+                        {% else %}
+                            Aucune description disponible.
+                        {% endif %}
+                    </p>
+                    <div class="mt-auto">
+                        <p class="h4 text-primary">{{ product.price }} €</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn btn-outline-primary">Voir détails</a>
+                            <form method="post" action="{{ path('app_cart_add', {'id': product.id}) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-secondary">
+                                     Ajouter au panier
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <p class="mb-3">Aucun produit disponible pour le moment.</p>
+                    <a href="{{ path('app_products_admin') }}" class="btn btn-primary">Ajouter des produits</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

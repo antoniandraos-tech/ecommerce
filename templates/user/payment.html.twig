@@ -1,0 +1,300 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Finaliser votre commande</h1>
+
+    <div class="row">
+        
+        <div class="col-md-8">
+           
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">1. Adresse de livraison</h4>
+                </div>
+                <div class="card-body">
+                    {% if app.user.adresses|length > 0 %}
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Choisissez une adresse :</strong></label>
+                            {% for adresse in app.user.adresses %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="adresse" id="adresse{{ adresse.id }}" 
+                                           value="{{ adresse.id }}" {% if loop.first %}checked{% endif %}>
+                                    <label class="form-check-label" for="adresse{{ adresse.id }}">
+                                        <strong>{{ adresse.adress }}</strong><br>
+                                        {{ adresse.codepostal }} {{ adresse.ville }}<br>
+                                        {{ adresse.pays }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                    {% endif %}
+                    
+                   
+                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#newAddressForm" aria-expanded="false">
+                        + Ajouter une nouvelle adresse
+                    </button>
+                    
+                    <div class="collapse mt-3" id="newAddressForm">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="newAdress" class="form-label">Adresse</label>
+                                <input type="text" class="form-control" id="newAdress" placeholder="123 rue Example">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="newCodePostal" class="form-label">Code postal</label>
+                                <input type="text" class="form-control" id="newCodePostal" placeholder="75001">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="newVille" class="form-label">Ville</label>
+                                <input type="text" class="form-control" id="newVille" placeholder="Paris">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="newPays" class="form-label">Pays</label>
+                                <input type="text" class="form-control" id="newPays" placeholder="France" value="France">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="saveNewAddress()">
+                            Enregistrer cette adresse
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">2. Choisir un mode de paiement</h4>
+                </div>
+                <div class="card-body">
+                   
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="cardPayment" 
+                               value="card" checked onchange="showPaymentForm('card')">
+                        <label class="form-check-label" for="cardPayment">
+                            <strong> Carte Bancaire</strong>
+                        </label>
+                    </div>
+                  
+                    <div id="cardForm" class="payment-form mb-4 p-3 border rounded">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="cardNumber" class="form-label">Numéro de carte</label>
+                                <input type="text" class="form-control" id="cardNumber" 
+                                       placeholder="1234 5678 9012 3456" maxlength="19" 
+                                       oninput="formatCardNumber(this)">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cardName" class="form-label">Nom sur la carte</label>
+                                <input type="text" class="form-control" id="cardName" 
+                                       placeholder="JEAN DUPONT" style="text-transform: uppercase;">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="cardExpiry" class="form-label">Date d'expiration</label>
+                                <input type="text" class="form-control" id="cardExpiry" 
+                                       placeholder="MM/AA" maxlength="5" 
+                                       oninput="formatExpiry(this)">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="cardCVV" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cardCVV" 
+                                       placeholder="123" maxlength="3" pattern="[0-9]{3}">
+                            </div>
+                        </div>
+                        <div class="alert alert-info" role="alert">
+                            <small> Vos informations de paiement sont sécurisées et cryptées</small>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypalPayment" 
+                               value="paypal" onchange="showPaymentForm('paypal')">
+                        <label class="form-check-label" for="paypalPayment">
+                            <strong> PayPal</strong>
+                        </label>
+                    </div>
+                
+                    <div id="paypalForm" class="payment-form mb-4 p-3 border rounded" style="display: none;">
+                        <p>Vous serez redirigé vers PayPal pour finaliser votre paiement de manière sécurisée.</p>
+                        <div class="text-center">
+                        <a href="https://www.paypal.com/signin">
+                            <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" 
+                                 alt="PayPal" style="max-width: 150px;">
+                                 </a>
+                        </div>
+                    </div>
+
+                  
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="applePayment" 
+                               value="apple_pay" onchange="showPaymentForm('applepay')">
+                        <label class="form-check-label" for="applePayment">
+                            <strong> Apple Pay</strong>
+                        </label>
+                    </div>
+                    
+                   
+                    <div id="applePayForm" class="payment-form mb-4 p-3 border rounded" style="display: none;">
+                        <p>Scannez le code QR avec votre iPhone pour payer avec Apple Pay :</p>
+                        <div class="text-center">
+                            <div class="border p-3 d-inline-block">
+                            <img src="">
+                            </div>
+                            <p class="mt-2"><small>Ou utilisez votre appareil Apple pour payer directement</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+        <div class="col-md-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Résumé de la commande</h4>
+                </div>
+                <div class="card-body">
+                    {% for item in items %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{{ item.product.name }} (x{{ item.quantity }})</span>
+                            <span>{{ item.product.price * item.quantity }} €</span>
+                        </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Sous-total :</strong></span>
+                        <span>{{ total }} €</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Livraison :</strong></span>
+                        <span>Gratuite</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Total :</strong></span>
+                        <span class="h4 text-primary"><strong>{{ total }} €</strong></span>
+                    </div>
+                    
+                    <button type="button" class="btn btn-success btn-lg w-100 mt-3" onclick="confirmPayment()">
+                        Confirmer le paiement
+                    </button>
+                    
+                    <a href="{{ path('app_basket') }}" class="btn btn-outline-secondary w-100 mt-2">
+                        Retour au panier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function formatCardNumber(input) {
+    let value = input.value.replace(/\s/g, '');
+    let formatted = value.match(/.{1,4}/g);
+    input.value = formatted ? formatted.join(' ') : value;
+}
+
+function formatExpiry(input) {
+    let value = input.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        input.value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    } else {
+        input.value = value;
+    }
+}
+
+function showPaymentForm(method) {
+    document.getElementById('cardForm').style.display = 'none';
+    document.getElementById('paypalForm').style.display = 'none';
+    document.getElementById('applePayForm').style.display = 'none';
+    
+    if (method === 'card') {
+        document.getElementById('cardForm').style.display = 'block';
+    } else if (method === 'paypal') {
+        document.getElementById('paypalForm').style.display = 'block';
+    } else if (method === 'applepay') {
+        document.getElementById('applePayForm').style.display = 'block';
+    }
+}
+
+function saveNewAddress() {
+    const adress = document.getElementById('newAdress').value;
+    const codePostal = document.getElementById('newCodePostal').value;
+    const ville = document.getElementById('newVille').value;
+    const pays = document.getElementById('newPays').value;
+    
+    if (!adress || !codePostal || !ville || !pays) {
+        alert('Veuillez remplir tous les champs');
+        return;
+    }
+    
+    alert('Adresse enregistrée avec succès !');
+}
+
+function confirmPayment() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    
+    // Vérification de l'adresse
+    const adresseSelected = document.querySelector('input[name="adresse"]:checked');
+    const newAddressForm = document.getElementById('newAddressForm');
+    
+    if (!adresseSelected && !newAddressForm.classList.contains('show')) {
+        alert('Veuillez sélectionner ou ajouter une adresse de livraison');
+        return;
+    }
+    
+    // Validation pour carte bancaire
+    if (paymentMethod === 'card') {
+        const cardNumber = document.getElementById('cardNumber').value;
+        const cardName = document.getElementById('cardName').value;
+        const cardExpiry = document.getElementById('cardExpiry').value;
+        const cardCVV = document.getElementById('cardCVV').value;
+        
+        if (!cardNumber || !cardName || !cardExpiry || !cardCVV) {
+            alert('Veuillez remplir toutes les informations de carte bancaire');
+            return;
+        }
+        
+        if (cardNumber.replace(/\s/g, '').length !== 16) {
+            alert('Le numéro de carte doit contenir 16 chiffres');
+            return;
+        }
+        
+        if (cardCVV.length !== 3) {
+            alert('Le CVV doit contenir 3 chiffres');
+            return;
+        }
+    }
+    
+    // Créer et soumettre un formulaire POST
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ path('app_payment_confirm') }}";
+    
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payment_method';
+    input.value = paymentMethod;
+    
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+
+<style>
+.payment-form {
+    background-color: #f8f9fa;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 20px;
+    z-index: 1020;
+}
+</style>
+{% endblock %}
