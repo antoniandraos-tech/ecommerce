@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Order;
+use App\Entity\OrderItem;
 use App\Repository\ProductRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,17 +48,14 @@ class ShopController extends AbstractController
         $session = $request->getSession();
         $cart = $session->get('cart', []);
 
-        // Récupérer la quantité demandée (par défaut 1)
         $quantity = (int) $request->request->get('quantity', 1);
 
-        // Vérifier que le produit existe
         $product = $productRepository->find($id);
         if (!$product) {
             $this->addFlash('error', 'Produit introuvable.');
             return $this->redirectToRoute('app_products');
         }
 
-        // Si le produit existe déjà dans le panier, on ajoute la quantité
         if (!empty($cart[$id])) {
             $cart[$id] += $quantity;
         } else {
@@ -118,12 +118,20 @@ class ShopController extends AbstractController
         
         return $this->redirectToRoute('app_basket');
     }
+    
+    #[Route('/basket/cvg', name: 'app_cvg')]
+    public function cvg(Request $request): Response
+    {
+        if (!$this->getCvg()) {
+            $this->addFlash('warning', 'Vous devez acceptez les conditions générales de ventes.');
+            return $this->redirectToRoute('app_payment');
+        }
+    }
 
     // Page de paiement
     #[Route('/basket/payment', name: 'app_payment')]
     public function payment(Request $request, ProductRepository $productRepository): Response
     {
-        // Vérifier que l'utilisateur est connecté
         if (!$this->getUser()) {
             $this->addFlash('warning', 'Vous devez être connecté pour passer commande.');
             return $this->redirectToRoute('app_login');
@@ -158,30 +166,60 @@ class ShopController extends AbstractController
         ]);
     }
 
+    // Confirmer le paiement et créer la commande
+    #[Route('/basket/payment/confirm', name: 'app_payment_confirm', methods: ['POST'])]
+    public function paymentConfirm(
+        Request $request,
+        ProductRepository $productRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
 
-#[Route('/basket/payment/confirm', name: 'app_payment_confirm', methods: ['POST'])]
-public function paymentConfirm(Request $request): Response
-{
-    // Vérifier que l'utilisateur est connecté
-    if (!$this->getUser()) {
-        return $this->redirectToRoute('app_login');
+        $session = $request->getSession();
+        $cart = $session->get('cart', []);
+        $paymentMethod = $request->request->get('payment_method');
+        $carrier = $request->request->get('carrier');
+
+        if (!in_array($paymentMethod, ['card', 'paypal', 'apple_pay'])) {
+            $this->addFlash('error', 'Méthode de paiement invalide.');
+            return $this->redirectToRoute('app_payment');
+        }
+
+        if (empty($cart)) {
+            $this->addFlash('warning', 'Votre panier est vide.');
+            return $this->redirectToRoute('app_products');
+        }
+
+        // Créer la commande
+        $order = new Order();
+        $order->setUser($this->getUser());
+        $order->setStatus('payée');
+        $order->setCarrier($carrier);
+
+        foreach ($cart as $id => $quantity) {
+            $product = $productRepository->find($id);
+            if ($product) {
+                $item = new OrderItem();
+                $item->setProduct($product);
+                $item->setQuantity($quantity);
+                $order->addItem($item);
+                $entityManager->persist($item);
+            }
+        }
+
+        $entityManager->persist($order);
+        $entityManager->flush();
+
+        // Vider le panier
+        $session->remove('cart');
+        
+        $this->addFlash('success', 'Paiement effectué avec succès ! Merci pour votre commande.');
+
+        return $this->render('user/payment_confirm.html.twig', [
+            'payment_method' => $paymentMethod,
+            'order' => $order
+        ]);
     }
-
-    $session = $request->getSession();
-    $paymentMethod = $request->request->get('payment_method');
-    
-    // Vérifier que la méthode de paiement est valide
-    if (!in_array($paymentMethod, ['card', 'paypal', 'apple_pay'])) {
-        $this->addFlash('error', 'Méthode de paiement invalide.');
-        return $this->redirectToRoute('app_payment');
-    }
-    
-    // Vider le panier après confirmation du paiement
-    $session->remove('cart');
-    
-    $this->addFlash('success', 'Paiement effectué avec succès ! Merci pour votre commande.');
-
-    return $this->render('user/payment_confirm.html.twig', [
-        'payment_method' => $paymentMethod
-    ]);
-}}
+}

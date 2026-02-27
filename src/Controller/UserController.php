@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,25 +16,30 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function show(User $user): Response
+    public function show(User $user, OrderRepository $orderRepository): Response
     {
         if ($this->getUser() !== $user) {
             throw $this->createAccessDeniedException('Vous ne pouvez consulter que votre propre profil.');
         }
 
+        $orders = $orderRepository->findBy(
+            ['user' => $user],
+            ['createdAt' => 'DESC']
+        );
+
         return $this->render('user/show.html.twig', [
             'user' => $user,
+            'orders' => $orders,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(
-        Request $request, 
-        User $user, 
+        Request $request,
+        User $user,
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher
-    ): Response
-    {
+    ): Response {
         if ($this->getUser() !== $user) {
             throw $this->createAccessDeniedException('Vous ne pouvez modifier que votre propre profil.');
         }

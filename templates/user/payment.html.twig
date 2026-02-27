@@ -10,8 +10,9 @@
         
         <div class="col-md-8">
            
+            {# 1. Adresse de livraison #}
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-dark text-white">
                     <h4 class="mb-0">1. Adresse de livraison</h4>
                 </div>
                 <div class="card-body">
@@ -33,8 +34,7 @@
                         <hr>
                     {% endif %}
                     
-                   
-                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" 
+                    <button class="btn btn-outline-dark" type="button" data-bs-toggle="collapse" 
                             data-bs-target="#newAddressForm" aria-expanded="false">
                         + Ajouter une nouvelle adresse
                     </button>
@@ -65,12 +65,102 @@
                 </div>
             </div>
 
+            {# 2. Choix du livreur #}
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">2. Choisir un mode de paiement</h4>
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">2. Choisir un livreur</h4>
                 </div>
                 <div class="card-body">
-                   
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <div class="carrier-card border rounded p-3 h-100" onclick="selectCarrier('ups', this)">
+                                <input class="form-check-input me-2" type="radio" name="carrier" id="carrier_ups" value="ups" checked>
+                                <label for="carrier_ups" class="form-check-label d-flex align-items-center gap-2" style="cursor:pointer;">
+                                    <span class="fs-4"></span>
+                                    <div>
+                                        <strong>UPS</strong><br>
+                                        <small class="text-muted">Livraison en 2-3 jours — 4,99 €</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="carrier-card border rounded p-3 h-100" onclick="selectCarrier('mondial_relay', this)">
+                                <input class="form-check-input me-2" type="radio" name="carrier" id="carrier_mondial" value="mondial_relay">
+                                <label for="carrier_mondial" class="form-check-label d-flex align-items-center gap-2" style="cursor:pointer;">
+                                    <span class="fs-4"></span>
+                                    <div>
+                                        <strong>Mondial Relay</strong><br>
+                                        <small class="text-muted">Livraison en point relais 3-5 jours — 2,99 €</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="carrier-card border rounded p-3 h-100" onclick="selectCarrier('colissimo', this)">
+                                <input class="form-check-input me-2" type="radio" name="carrier" id="carrier_colissimo" value="colissimo">
+                                <label for="carrier_colissimo" class="form-check-label d-flex align-items-center gap-2" style="cursor:pointer;">
+                                    <span class="fs-4"></span>
+                                    <div>
+                                        <strong>Colissimo</strong><br>
+                                        <small class="text-muted">Livraison en 2-4 jours — 5,90 €</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="carrier-card border rounded p-3 h-100" onclick="selectCarrier('chronopost', this)">
+                                <input class="form-check-input me-2" type="radio" name="carrier" id="carrier_chronopost" value="chronopost">
+                                <label for="carrier_chronopost" class="form-check-label d-flex align-items-center gap-2" style="cursor:pointer;">
+                                    <span class="fs-4"></span>
+                                    <div>
+                                        <strong>Chronopost</strong><br>
+                                        <small class="text-muted">Livraison express 24h — 9,90 €</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="carrier-card border rounded p-3 h-100" onclick="selectCarrier('dpd', this)">
+                                <input class="form-check-input me-2" type="radio" name="carrier" id="carrier_dpd" value="dpd">
+                                <label for="carrier_dpd" class="form-check-label d-flex align-items-center gap-2" style="cursor:pointer;">
+                                    <span class="fs-4"></span>
+                                    <div>
+                                        <strong>DPD</strong><br>
+                                        <small class="text-muted">Livraison en 3-5 jours — 3,99 €</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="carrier-card border rounded p-3 h-100" onclick="selectCarrier('fedex', this)">
+                                <input class="form-check-input me-2" type="radio" name="carrier" id="carrier_fedex" value="fedex">
+                                <label for="carrier_fedex" class="form-check-label d-flex align-items-center gap-2" style="cursor:pointer;">
+                                    <span class="fs-4"></span>
+                                    <div>
+                                        <strong>FedEx</strong><br>
+                                        <small class="text-muted">Livraison internationale 3-7 jours — 12,90 €</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            {# 3. Mode de paiement #}
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">3. Choisir un mode de paiement</h4>
+                </div>
+                <div class="card-body">
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="cardPayment" 
                                value="card" checked onchange="showPaymentForm('card')">
@@ -120,14 +210,13 @@
                     <div id="paypalForm" class="payment-form mb-4 p-3 border rounded" style="display: none;">
                         <p>Vous serez redirigé vers PayPal pour finaliser votre paiement de manière sécurisée.</p>
                         <div class="text-center">
-                        <a href="https://www.paypal.com/signin">
-                            <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" 
-                                 alt="PayPal" style="max-width: 150px;">
-                                 </a>
+                            <a href="https://www.paypal.com/signin">
+                                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" 
+                                     alt="PayPal" style="max-width: 150px;">
+                            </a>
                         </div>
                     </div>
 
-                  
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="applePayment" 
                                value="apple_pay" onchange="showPaymentForm('applepay')">
@@ -136,12 +225,11 @@
                         </label>
                     </div>
                     
-                   
                     <div id="applePayForm" class="payment-form mb-4 p-3 border rounded" style="display: none;">
                         <p>Scannez le code QR avec votre iPhone pour payer avec Apple Pay :</p>
                         <div class="text-center">
                             <div class="border p-3 d-inline-block">
-                            <img src="">
+                                <img src="">
                             </div>
                             <p class="mt-2"><small>Ou utilisez votre appareil Apple pour payer directement</small></p>
                         </div>
@@ -150,10 +238,10 @@
             </div>
         </div>
 
-       
+        {# Résumé commande #}
         <div class="col-md-4">
             <div class="card sticky-top" style="top: 20px;">
-                <div class="card-header bg-secondary text-white">
+                <div class="card-header bg-dark text-white">
                     <h4 class="mb-0">Résumé de la commande</h4>
                 </div>
                 <div class="card-body">
@@ -164,21 +252,35 @@
                         </div>
                     {% endfor %}
                     <hr>
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between mb-1">
                         <span><strong>Sous-total :</strong></span>
                         <span>{{ total }} €</span>
                     </div>
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between mb-1">
                         <span><strong>Livraison :</strong></span>
-                        <span>Gratuite</span>
+                        <span id="shippingCost">4,99 €</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between">
                         <span><strong>Total :</strong></span>
-                        <span class="h4 text-primary"><strong>{{ total }} €</strong></span>
+                        <span class="h4 text-dark"><strong id="grandTotal">{{ total + 4.99 }} €</strong></span>
                     </div>
-                    
-                    <button type="button" class="btn btn-success btn-lg w-100 mt-3" onclick="confirmPayment()">
+                    <div class="mt-2 mb-3">
+                        <small class="text-muted">Livreur sélectionné : <strong id="carrierLabel">UPS</strong></small>
+                    </div>
+                     <div class="col-md-6">
+                            <div class="carrier-card border rounded p-3 h-100" onclick="selectCarrier('cvg', this)">
+                                <input class="form-check-input me-2" type="radio" name="carrier" id="carrier_cvg" value="cvg" checked>
+                                <label for="carrier_cvg" class="form-check-label d-flex align-items-center gap-2" style="cursor:pointer;">
+                                    <span class="fs-4"></span>
+                                    <div>
+                                        <strong a href=".\templates\user">Veuillez lire et acceptez les conditions générales de ventes (cvg</strong><br>
+                                        <small class="text-muted"></small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    <button type="button" class="btn btn-dark btn-lg w-100 mt-3" onclick="confirmPayment()">
                         Confirmer le paiement
                     </button>
                     
@@ -192,6 +294,38 @@
 </div>
 
 <script>
+const baseTotal = {{ total }};
+
+const carrierPrices = {
+    'ups':           { label: 'UPS',           price: 4.99 },
+    'mondial_relay': { label: 'Mondial Relay', price: 2.99 },
+    'colissimo':     { label: 'Colissimo',     price: 5.90 },
+    'chronopost':    { label: 'Chronopost',    price: 9.90 },
+    'dpd':           { label: 'DPD',           price: 3.99 },
+    'fedex':         { label: 'FedEx',         price: 12.90 },
+};
+
+function selectCarrier(value, card) {
+    // Décocher toutes les cartes
+    document.querySelectorAll('.carrier-card').forEach(c => c.classList.remove('border-dark', 'bg-light'));
+    card.classList.add('border-dark', 'bg-light');
+
+    // Cocher le bon radio
+    document.getElementById('carrier_' + value).checked = true;
+
+    // Mettre à jour le résumé
+    const carrier = carrierPrices[value];
+    document.getElementById('shippingCost').textContent = carrier.price.toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('grandTotal').textContent = (baseTotal + carrier.price).toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('carrierLabel').textContent = carrier.label;
+}
+
+// Sélectionner UPS par défaut au chargement
+window.addEventListener('DOMContentLoaded', () => {
+    const upsCard = document.querySelector('.carrier-card');
+    if (upsCard) upsCard.classList.add('border-dark', 'bg-light');
+});
+
 function formatCardNumber(input) {
     let value = input.value.replace(/\s/g, '');
     let formatted = value.match(/.{1,4}/g);
@@ -231,14 +365,13 @@ function saveNewAddress() {
         alert('Veuillez remplir tous les champs');
         return;
     }
-    
     alert('Adresse enregistrée avec succès !');
 }
 
 function confirmPayment() {
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-    
-    // Vérification de l'adresse
+    const carrier = document.querySelector('input[name="carrier"]:checked').value;
+
     const adresseSelected = document.querySelector('input[name="adresse"]:checked');
     const newAddressForm = document.getElementById('newAddressForm');
     
@@ -246,8 +379,12 @@ function confirmPayment() {
         alert('Veuillez sélectionner ou ajouter une adresse de livraison');
         return;
     }
+
+    if (!carrier) {
+        alert('Veuillez sélectionner un livreur');
+        return;
+    }
     
-    // Validation pour carte bancaire
     if (paymentMethod === 'card') {
         const cardNumber = document.getElementById('cardNumber').value;
         const cardName = document.getElementById('cardName').value;
@@ -258,29 +395,32 @@ function confirmPayment() {
             alert('Veuillez remplir toutes les informations de carte bancaire');
             return;
         }
-        
         if (cardNumber.replace(/\s/g, '').length !== 16) {
             alert('Le numéro de carte doit contenir 16 chiffres');
             return;
         }
-        
         if (cardCVV.length !== 3) {
             alert('Le CVV doit contenir 3 chiffres');
             return;
         }
     }
     
-    // Créer et soumettre un formulaire POST
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = "{{ path('app_payment_confirm') }}";
     
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'payment_method';
-    input.value = paymentMethod;
+    const inputPayment = document.createElement('input');
+    inputPayment.type = 'hidden';
+    inputPayment.name = 'payment_method';
+    inputPayment.value = paymentMethod;
+
+    const inputCarrier = document.createElement('input');
+    inputCarrier.type = 'hidden';
+    inputCarrier.name = 'carrier';
+    inputCarrier.value = carrier;
     
-    form.appendChild(input);
+    form.appendChild(inputPayment);
+    form.appendChild(inputCarrier);
     document.body.appendChild(form);
     form.submit();
 }
@@ -290,11 +430,16 @@ function confirmPayment() {
 .payment-form {
     background-color: #f8f9fa;
 }
-
-.sticky-top {
-    position: sticky;
-    top: 20px;
-    z-index: 1020;
+.carrier-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.carrier-card:hover {
+    background-color: #f8f9fa;
+    border-color: #343a40 !important;
+}
+.carrier-card.border-dark {
+    border-width: 2px !important;
 }
 </style>
 {% endblock %}
